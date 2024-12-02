@@ -30,7 +30,7 @@ public class CurrencyExchangeRateService {
                         (CurrencyExchangeRateEntity currencyExchangeRateEntity) ->
                                 new CurrencyExchangeRateDTO(
                                         currencyExchangeRateEntity.getId(),
-                                        currencyExchangeRateEntity.getScraperEntity().getId(),
+                                        currencyExchangeRateEntity.getScraperId(),
                                         currencyExchangeRateEntity.getUnit(),
                                         currencyExchangeRateEntity.getUnitCurrencyCode(),
                                         currencyExchangeRateEntity.getRateCurrencyCode(),
@@ -50,7 +50,7 @@ public class CurrencyExchangeRateService {
                         (CurrencyExchangeRateEntity currencyExchangeRateEntity) ->
                                 new CurrencyExchangeRateDTO(
                                         currencyExchangeRateEntity.getId(),
-                                        currencyExchangeRateEntity.getScraperEntity().getId(),
+                                        currencyExchangeRateEntity.getScraperId(),
                                         currencyExchangeRateEntity.getUnit(),
                                         currencyExchangeRateEntity.getUnitCurrencyCode(),
                                         currencyExchangeRateEntity.getRateCurrencyCode(),

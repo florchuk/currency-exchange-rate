@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 public class CurrencyExchangeRateEntity {
     private Integer id;
 
-    private ScraperEntity scraperEntity;
+    private Integer scraperId;
 
     private Integer unit;
 

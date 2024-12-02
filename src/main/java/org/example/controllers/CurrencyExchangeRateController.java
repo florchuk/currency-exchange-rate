@@ -4,20 +4,19 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Positive;
 import org.example.dto.CurrencyExchangeRateDTO;
+import org.example.exceptions.CurrencyExchangeRateNotFoundException;
 import org.example.services.CurrencyExchangeRateService;
 import org.example.utils.Content;
 import org.example.utils.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
 
-@Validated
-@RequestMapping(path = "/api")
+@RequestMapping(path = "/api/currency-exchange-rates")
 @RestController
 public class CurrencyExchangeRateController {
     private final CurrencyExchangeRateService currencyExchangeRateService;
@@ -26,7 +25,7 @@ public class CurrencyExchangeRateController {
         this.currencyExchangeRateService = currencyExchangeRateService;
     }
 
-    @GetMapping(path = "/currency-exchange-rates")
+    @GetMapping(path = {"", "/"})
     public ResponseEntity<Page<CurrencyExchangeRateDTO>> getCurrencyExchangeRates(
             @RequestParam(name = "page", required = false, defaultValue = "1") @Positive Integer page,
             @RequestParam(name = "page_size", required = false, defaultValue = "50") @Positive @Max(value = 50) Integer pageSize,
@@ -48,14 +47,16 @@ public class CurrencyExchangeRateController {
         return new ResponseEntity<>(pageCurrencyExchangeRateDTOs, HttpStatus.OK);
     }
 
-    @GetMapping(path = "/currency-exchange-rates/{id}")
+    @GetMapping(path = {"/{id}", "/{id}/"})
     public ResponseEntity<Content<CurrencyExchangeRateDTO>> getCurrencyExchangeRates(
             @PathVariable(name = "id") @Positive Integer id
-    ) {
+    ) throws CurrencyExchangeRateNotFoundException {
         Optional<CurrencyExchangeRateDTO> optionalCurrencyExchangeRateDTO = this.currencyExchangeRateService.find(id);
 
-        return optionalCurrencyExchangeRateDTO.isPresent()
-                ? new ResponseEntity<>(new Content<>(optionalCurrencyExchangeRateDTO.stream().toList()), HttpStatus.OK)
-                : new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        if (optionalCurrencyExchangeRateDTO.isPresent()) {
+            return ResponseEntity.ok(new Content<>(optionalCurrencyExchangeRateDTO.stream().toList()));
+        } else {
+            throw new CurrencyExchangeRateNotFoundException();
+        }
     }
 }

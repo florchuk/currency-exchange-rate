@@ -1,7 +1,6 @@
 package org.example.dao;
 
 import org.example.entities.CurrencyExchangeRateEntity;
-import org.example.entities.ScraperEntity;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Component;
@@ -30,15 +29,8 @@ public class PostgreSQLCurrencyExchangeRateDAO implements CurrencyExchangeRateDA
                             cer.buy_rate AS cer_buy_rate,
                             cer.sale_rate AS cer_sale_rate,
                             cer.created_at AS cer_created_at,
-                            cer.updated_at AS cer_updated_at,
-                            s.name_en AS s_name_en,
-                            s.name_uk AS s_name_uk,
-                            s.created_at AS s_created_at,
-                            s.updated_at AS s_updated_at
+                            cer.updated_at AS cer_updated_at
                         FROM currency_exchange_rates cer
-                        INNER JOIN scrapers s ON (
-                            cer.scraper_id = s.id
-                        )
                         WHERE cer.id = :id
                         LIMIT 1;
                     """,
@@ -46,13 +38,7 @@ public class PostgreSQLCurrencyExchangeRateDAO implements CurrencyExchangeRateDA
                     (rs, rowNum) ->
                             new CurrencyExchangeRateEntity(
                                     id,
-                                    new ScraperEntity(
-                                            rs.getInt("cer_scraper_id"),
-                                            rs.getString("s_name_en"),
-                                            rs.getString("s_name_uk"),
-                                            rs.getTimestamp("s_created_at").toLocalDateTime(),
-                                            rs.getTimestamp("s_updated_at").toLocalDateTime()
-                                    ),
+                                    rs.getInt("cer_scraper_id"),
                                     rs.getInt("cer_unit"),
                                     rs.getString("cer_unit_currency_code"),
                                     rs.getString("cer_rate_currency_code"),
@@ -85,15 +71,8 @@ public class PostgreSQLCurrencyExchangeRateDAO implements CurrencyExchangeRateDA
                             cer.buy_rate AS cer_buy_rate,
                             cer.sale_rate AS cer_sale_rate,
                             cer.created_at AS cer_created_at,
-                            cer.updated_at AS cer_updated_at,
-                            s.name_en AS s_name_en,
-                            s.name_uk AS s_name_uk,
-                            s.created_at AS s_created_at,
-                            s.updated_at AS s_updated_at
+                            cer.updated_at AS cer_updated_at
                         FROM currency_exchange_rates cer
-                        INNER JOIN scrapers s ON (
-                            cer.scraper_id = s.id
-                        )
                         ORDER BY""" + " " + sortName + " " + sortOrder + """
                         LIMIT :limit OFFSET :offset;
                     """,
@@ -103,13 +82,7 @@ public class PostgreSQLCurrencyExchangeRateDAO implements CurrencyExchangeRateDA
                     (rs, rowNum) -> {
                             CurrencyExchangeRateEntity currencyExchangeRateEntity = new CurrencyExchangeRateEntity(
                                     rs.getInt("cer_id"),
-                                    new ScraperEntity(
-                                            rs.getInt("cer_scraper_id"),
-                                            rs.getString("s_name_en"),
-                                            rs.getString("s_name_uk"),
-                                            rs.getTimestamp("s_created_at").toLocalDateTime(),
-                                            rs.getTimestamp("s_updated_at").toLocalDateTime()
-                                    ),
+                                    rs.getInt("cer_scraper_id"),
                                     rs.getInt("cer_unit"),
                                     rs.getString("cer_unit_currency_code"),
                                     rs.getString("cer_rate_currency_code"),

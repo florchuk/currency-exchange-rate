@@ -4,20 +4,19 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Positive;
 import org.example.dto.ScraperDTO;
+import org.example.exceptions.ScraperNotFoundException;
 import org.example.services.ScraperService;
 import org.example.utils.Content;
 import org.example.utils.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicLong;
 
-@Validated
-@RequestMapping(path = "/api")
+@RequestMapping(path = "/api/scrapers")
 @RestController
 public class ScraperController {
     private final ScraperService scraperService;
@@ -26,7 +25,7 @@ public class ScraperController {
         this.scraperService = scraperService;
     }
 
-    @GetMapping(path = "/scrapers")
+    @GetMapping(path = {"", "/"})
     public ResponseEntity<Page<ScraperDTO>> getScrapers(
             @RequestParam(name = "page", required = false, defaultValue = "1") @Positive Integer page,
             @RequestParam(name = "page_size", required = false, defaultValue = "50") @Positive @Max(value = 50) Integer pageSize,
@@ -47,12 +46,16 @@ public class ScraperController {
         return new ResponseEntity<>(pageScraperDTOs, HttpStatus.OK);
     }
 
-    @GetMapping(path = "/scrapers/{id}")
-    public ResponseEntity<Content<ScraperDTO>> getScrapers(@PathVariable(name = "id") @Positive Integer id) {
+    @GetMapping(path = {"/{id}", "/{id}/"})
+    public ResponseEntity<Content<ScraperDTO>> getScrapers(@PathVariable(name = "id") @Positive Integer id)
+            throws ScraperNotFoundException
+    {
         Optional<ScraperDTO> optionalScraperDTO = this.scraperService.find(id);
 
-        return optionalScraperDTO.isPresent()
-                ? new ResponseEntity<>(new Content<>(optionalScraperDTO.stream().toList()), HttpStatus.OK)
-                : new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        if (optionalScraperDTO.isPresent()) {
+            return ResponseEntity.ok(new Content<>(optionalScraperDTO.stream().toList()));
+        } else {
+            throw new ScraperNotFoundException();
+        }
     }
 }
